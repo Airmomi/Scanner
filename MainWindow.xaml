@@ -1,0 +1,112 @@
+﻿<Window x:Name="端口扫描器" x:Class="Scanner.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Scanner"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="459">
+    <Grid>
+        <TabControl Grid.ColumnSpan="2">
+            <TabItem Header="TCP连接">
+                <Grid Background="White">
+                    <Label Content="目标IP" HorizontalAlignment="Left" Margin="26,10,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_ip_one" HorizontalAlignment="Left" Margin="114,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120">
+                        <TextBox.Resources>
+                            <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left" AlignmentY="Top">
+                                <VisualBrush.Visual>
+                                    <TextBlock FontStyle="Italic" Text="请输入目标IP地址"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </TextBox.Resources>
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Label Content="扫描端口区间" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_port_min_one" HorizontalAlignment="Left" Margin="114,44,0,0" Text="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                    <Label Content="至" HorizontalAlignment="Left" Margin="179,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_port_max_one" HorizontalAlignment="Left" Margin="206,44,0,0" Text="65535" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                    <TextBox x:Name="m_textbox_result_one" HorizontalAlignment="Center" Margin="0,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="433" Height="314" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                    <Button x:Name="m_button_start_one" HorizontalAlignment="Left" Margin="288,10,0,0" VerticalAlignment="Top" Height="51" Width="137" Click="Button_start_one_Click" Content="开始扫描" Visibility="Visible"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="多线程,方案一">
+                <Grid Background="White">
+                    <Label Content="目标IP" HorizontalAlignment="Left" Margin="26,10,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_ip_two" HorizontalAlignment="Left" Margin="114,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120">
+                        <TextBox.Resources>
+                            <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left" AlignmentY="Top">
+                                <VisualBrush.Visual>
+                                    <TextBlock FontStyle="Italic" Text="请输入目标IP地址"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </TextBox.Resources>
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Label Content="扫描端口区间" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_port_min_two" HorizontalAlignment="Left" Margin="114,44,0,0" Text="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                    <Label Content="至" HorizontalAlignment="Left" Margin="179,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_port_max_two" HorizontalAlignment="Left" Margin="206,44,0,0" Text="65535" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                    <TextBox x:Name="m_textbox_result_two" HorizontalAlignment="Center" Margin="0,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="433" Height="314" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                    <Button x:Name="m_button_start_two" HorizontalAlignment="Left" Margin="288,10,0,0" VerticalAlignment="Top" Height="51" Width="137" Content="开始扫描" Visibility="Visible" Click="Button_start_two_Click"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="多线程，方案二">
+                <Grid Background="White">
+                    <Label Content="目标IP" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_ip_three" HorizontalAlignment="Left" Margin="55,14,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="106">
+                        <TextBox.Resources>
+                            <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left" AlignmentY="Top">
+                                <VisualBrush.Visual>
+                                    <TextBlock FontStyle="Italic" Text="请输入目标IP地址"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </TextBox.Resources>
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Label Content="扫描端口区间" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_port_min_three" HorizontalAlignment="Left" Margin="114,44,0,0" Text="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                    <Label Content="至" HorizontalAlignment="Left" Margin="179,40,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_target_port_max_three" HorizontalAlignment="Left" Margin="206,44,0,0" Text="65535" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                    <TextBox x:Name="m_textbox_result_three" HorizontalAlignment="Center" Margin="0,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="433" Height="314" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                    <Button x:Name="m_button_start_three" HorizontalAlignment="Left" Margin="288,10,0,0" VerticalAlignment="Top" Height="51" Width="137" Content="开始扫描" Visibility="Visible" Click="Button_start_three_Click"/>
+                    <Label Content="线程数" HorizontalAlignment="Left" Margin="166,10,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="m_textbox_thread_num_three" HorizontalAlignment="Left" Margin="217,14,0,0" Text="10" TextWrapping="Wrap" VerticalAlignment="Top" Width="60"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
