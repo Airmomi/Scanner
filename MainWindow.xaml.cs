@@ -33,18 +33,19 @@ namespace Scanner
 
         public void Start_scan_tcp_connect()                            //TCP连接扫描线程
         {
+            //初始化信息
             m_textbox_result_one.Dispatcher.Invoke(new Action(() => m_textbox_result_one.Text=""));
             Socket test = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPAddress target_ip = IPAddress.Parse(m_textbox_target_ip_one.Dispatcher.Invoke(new Func<string>(()=> m_textbox_target_ip_one.Text.Trim())));
             int port_min = int.Parse(m_textbox_target_port_min_one.Dispatcher.Invoke(new Func<string>(()=> m_textbox_target_port_min_one.Text.Trim())));
             int port_max = int.Parse(m_textbox_target_port_max_one.Dispatcher.Invoke(new Func<string>(() => m_textbox_target_port_max_one.Text.Trim())));
-
+            //循环扫描端口
             int i;
             for (i = port_min; i <= port_max; i++)
             {
                 try
                 {
-                    test.Connect(target_ip, i);
+                    test.Connect(target_ip, i);  //使用connect函数来判断端口是否开启
                 }
                 catch (Exception)
                 {
@@ -114,24 +115,29 @@ namespace Scanner
 
         public void Start_multi_thread_scan_two(object target_port)
         {
+            //初始化信息
             int target_port_num = int.Parse(target_port.ToString());
             Socket test = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPAddress target_ip = IPAddress.Parse(m_textbox_target_ip_two.Dispatcher.Invoke(new Func<string>(() => m_textbox_target_ip_two.Text.Trim())));
 
+            //判断是否连接成功
             try
             {
                 test.Connect(target_ip, target_port_num);
             }
             catch (Exception)
             {
-                mutex_two.WaitOne();
+                //连接失败，说明端口关闭
+                mutex_two.WaitOne();//PV操作
                 finish_scan_num_two += 1;
                 m_textbox_result_two.Dispatcher.Invoke(new Action(()=>m_textbox_result_two.Text=string.Format("{0}/{1} 已完成",finish_scan_num_two,port_all_num_two)));
                 mutex_two.ReleaseMutex();
                 test.Dispose();
-                return;
+                return;//端口失败时直接退出，不执行连接成功时的代码
             }
-            mutex_two.WaitOne();
+
+            //连接成功，说明端口开启
+            mutex_two.WaitOne();//PV操作
             finish_scan_num_two += 1;
             is_active_two[target_port_num-1] = true;
             m_textbox_result_two.Dispatcher.Invoke(new Action(() => m_textbox_result_two.Text = string.Format("{0}/{1} 已完成", finish_scan_num_two, port_all_num_two)));
@@ -151,7 +157,7 @@ namespace Scanner
             for (i = 0; i < 65535; i++) is_active_two [i]= false;
 
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
+            sw.Start();//记录扫描所用的时间
             //开始扫描
             for (i = port_min; i <= port_max; i++)
             {
@@ -162,13 +168,14 @@ namespace Scanner
             bool is_finish = false;
             while (true)
             {
-                mutex_two.WaitOne();
+                mutex_two.WaitOne();//PV操作
+                //如果已经扫描的端口数等于需要扫描的端口数，那么扫描结束
                 if (finish_scan_num_two == port_all_num_two) is_finish = true;
                 mutex_two.ReleaseMutex();
 
                 if (is_finish)
                 {
-                    sw.Stop();
+                    sw.Stop();//停止记录时间
                     m_textbox_result_two.Dispatcher.Invoke(new Action(() => m_textbox_result_two.Text = string.Format("扫描已完成,用时{0}ms，结果如下\n",sw.ElapsedMilliseconds)));
                     Print_result_two(port_min,port_max);
                     m_button_start_two.Dispatcher.Invoke(new Action(() => m_button_start_two.IsEnabled = true));
@@ -200,8 +207,10 @@ namespace Scanner
         private void Button_start_two_Click(object sender, RoutedEventArgs e)
         {
             m_textbox_result_two.Text = "";
+            //开启控制线程
             Thread start = new Thread(new ThreadStart(Thread_control_two));
             start.Start();
+            //避免误操作使控件无效
             m_button_start_two.IsEnabled = false;
             m_textbox_target_ip_two.IsEnabled = false;
             m_textbox_target_port_max_two.IsEnabled = false;
@@ -229,20 +238,23 @@ namespace Scanner
             IPAddress target_ip = IPAddress.Parse(m_textbox_target_ip_one.Dispatcher.Invoke(new Func<string>(() => m_textbox_target_ip_three.Text.Trim())));
             while (!is_finish)
             {
-                mutex_three.WaitOne();
+                mutex_three.WaitOne();//PV操作
+                //需要扫描的端口最大值与当前已经扫描的端口最大值比较来判断是否还有需要扫描的端口
                 if (now_scan_port_three <= target_num_max_three)
                 {
+                    //还有需要扫描的端口
                     now_scan_port = now_scan_port_three;
-                    now_scan_port_three += 1;
+                    now_scan_port_three += 1; //当前已经扫描的端口最大值加1
                 }
-                else
+                else//没有需要扫描的端口
                 {
                     is_finish = true;
                 }
                 mutex_three.ReleaseMutex();
 
-                if (!is_finish)
+                if (!is_finish)//如果有需要扫描的端口
                 {
+                    //扫描端口
                     test = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     is_connected = true;
                     try
@@ -251,6 +263,7 @@ namespace Scanner
                     }
                     catch (Exception)
                     {
+                        //端口关闭，储存相关信息
                         mutex_three.WaitOne();
                         finish_scan_num_three += 1;
                         m_textbox_result_three.Dispatcher.Invoke(new Action(() => m_textbox_result_three.Text = string.Format("{0}/{1} 已完成", finish_scan_num_three, port_all_num_three)));
@@ -263,6 +276,7 @@ namespace Scanner
                     }
                     if (is_connected)
                     {
+                        //端口开启，储存相关信息
                         mutex_three.WaitOne();
                         is_active_three[now_scan_port-1] = true;
                         finish_scan_num_three += 1;
@@ -285,8 +299,8 @@ namespace Scanner
             finish_scan_num_three = 0;
 
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            //开始扫描
+            sw.Start();//记录扫描时间
+            //根据设定的线程数开启线程
             for(i=0;i<int.Parse(m_textbox_thread_num_three.Dispatcher.Invoke(new Func<string>(()=>m_textbox_thread_num_three.Text.Trim())));i++)
             {
                 new Thread(new ThreadStart(Start_multi_thread_scan_three)).Start();
@@ -335,7 +349,8 @@ namespace Scanner
         {
             m_textbox_result_three.Text = "";
             Thread start = new Thread(new ThreadStart(Thread_control_three));
-            start.Start();
+            start.Start();//开启控制线程
+            //避免误操作使控件无效
             m_button_start_three.IsEnabled = false;
             m_textbox_target_ip_three.IsEnabled = false;
             m_textbox_target_port_max_three.IsEnabled = false;
